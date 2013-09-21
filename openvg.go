@@ -417,7 +417,10 @@ func OpenImage(path string) (*Image, error) {
 	return vg, nil
 }
 
-//func (im *Image) Draw(
+// Draw image using existing scale/translation settings
+func (im *Image) Draw() {
+	C.vgDrawImage(C.VGImage(*im))
+}
 
 func ImageGo(x, y float32, im image.Image) {
 	bounds := im.Bounds()
