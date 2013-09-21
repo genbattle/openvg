@@ -21,6 +21,7 @@ import (
 	"runtime"
 	"strings"
 	"unsafe"
+	"errors"
 )
 
 // RGB defines the red, green, blue triple that makes up colors.
@@ -350,6 +351,74 @@ func fakeimage(x, y float32, w, h int, s string) {
 	TextMid(x+(fw/2), y+(fh/2), s, "sans", w/20)
 }
 
+// Type alias for a VGImage resource in graphics memory
+type Image C.VGImage
+
+// Create a new Image texture in Video memory
+func NewImage(im *image.Image) *Image {
+	bounds := (*im).Bounds()
+	width := int32(bounds.Max.X - bounds.Min.X)
+	height := int32(bounds.Max.Y - bounds.Min.Y)
+	// Type switch to get the true image type
+	// Create texture
+	switch i := (*im).(type) {
+	case *image.Gray:
+		vg := new(Image)
+		*vg = Image(C.vgCreateImage(C.VG_lL_8, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
+		if vg == nil {
+			return nil
+		}
+		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(i.Pix[0])), C.VGint(i.Stride), C.VG_lL_8, 0, 0, C.VGint(width), C.VGint(height))
+		return vg
+	case *image.Alpha:
+		vg := new(Image)
+		*vg = Image(C.vgCreateImage(C.VG_A_8, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
+		if vg == nil {
+			return nil
+		}
+		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(i.Pix[0])), C.VGint(i.Stride), C.VG_A_8, 0, 0, C.VGint(width), C.VGint(height))
+		return vg
+	case *image.NRGBA:
+		vg := new(Image)
+		*vg = Image(C.vgCreateImage(C.VG_lRGBA_8888, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
+		if vg == nil {
+			return nil
+		}
+		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(i.Pix[0])), C.VGint(i.Stride), C.VG_lRGBA_8888, 0, 0, C.VGint(width), C.VGint(height))
+		return vg
+	case *image.RGBA:
+		vg := new(Image)
+		*vg = Image(C.vgCreateImage(C.VG_lRGBA_8888_PRE, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
+		if vg == nil {
+			return nil
+		}
+		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(i.Pix[0])), C.VGint(i.Stride), C.VG_lRGBA_8888_PRE, 0, 0, C.VGint(width), C.VGint(height))
+		return vg
+	default:
+		// TODO: convert other image formats
+		return nil
+	}
+}
+
+// Create a new Image texture in Video memory from a file path
+func OpenImage(path string) (*Image, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	im, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
+	}
+	vg := NewImage(&im)
+	if vg == nil {
+		return nil, errors.New("Error while converting image to texture")
+	}
+	return vg, nil
+}
+
+//func (im *Image) Draw(
+
 func ImageGo(x, y float32, im image.Image) {
 	bounds := im.Bounds()
 	minx := bounds.Min.X
@@ -376,7 +445,7 @@ func ImageGo(x, y float32, im image.Image) {
 }
 
 // Image places the named image at (x,y) with dimensions (w,h)
-func Image(x, y float32, s string) {
+func ImageOld(x, y float32, s string) {
 	var img image.Image
 	var derr error
 	f, err := os.Open(s)
