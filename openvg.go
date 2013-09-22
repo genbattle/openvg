@@ -422,6 +422,11 @@ func (im *Image) Draw() {
 	C.vgDrawImage(C.VGImage(*im))
 }
 
+// Frees all resources associated with the image. It cannot be used after this point.
+func (im *Image) Destroy() {
+	C.vgDestroyImage(C.VGImage(*im))
+}
+
 // Line draws a line between two points
 func Line(x1, y1, x2, y2 float32, style ...string) {
 	C.Line(C.VGfloat(x1), C.VGfloat(y1), C.VGfloat(x2), C.VGfloat(y2))
