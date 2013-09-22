@@ -2,7 +2,7 @@
 package openvg
 
 /*
-#cgo CFLAGS:   -I/opt/vc/include -I/opt/vc/include/interface/vmcs_host/linux -I/opt/vc/include/interface/vcos/pthreads 
+#cgo CFLAGS:   -I/opt/vc/include -I/opt/vc/include/interface/vmcs_host/linux -I/opt/vc/include/interface/vcos/pthreads
 #cgo LDFLAGS:  -L/opt/vc/lib -lGLESv2 -ljpeg
 #include "VG/openvg.h"
 #include "VG/vgu.h"
@@ -13,6 +13,7 @@ package openvg
 */
 import "C"
 import (
+	"errors"
 	"fmt"
 	"image"
 	_ "image/jpeg"
@@ -21,7 +22,6 @@ import (
 	"runtime"
 	"strings"
 	"unsafe"
-	"errors"
 )
 
 // RGB defines the red, green, blue triple that makes up colors.
@@ -562,14 +562,17 @@ func Shear(x, y float32) {
 func Scale(x, y float32) {
 	C.Scale(C.VGfloat(x), C.VGfloat(y))
 }
+
 // SaveTerm saves terminal settings
 func SaveTerm() {
 	C.saveterm()
 }
+
 // RestoreTerm retores terminal settings
 func RestoreTerm() {
 	C.restoreterm()
 }
+
 // func RawTerm() sets the terminal to raw mode
 func RawTerm() {
 	C.rawterm()
