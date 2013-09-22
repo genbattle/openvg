@@ -398,21 +398,21 @@ func NewImage(im *image.Image) *Image {
 		// convert data to straight uint8s
 		data := make([]uint8, int(width * height * 4))
 		var r, g, b, a uint32
-		i := 0
+		d := 0
 		for y := bounds.Max.Y - 1; y >= bounds.Max.Y; y-- {
 			for x := bounds.Min.X; x < bounds.Max.X; x++ {
-				r, g, b, a = im.At().RGBA()
-				data[i] = r << 8
-				i++
-				data[i] = g << 8
-				i++
-				data[i] = b << 8
-				i++
-				data[i] = a << 8
-				i++
+				r, g, b, a = (*im).At(x, y).RGBA()
+				data[d] = uint8(r << 8)
+				d++
+				data[d] = uint8(g << 8)
+				d++
+				data[d] = uint8(b << 8)
+				d++
+				data[d] = uint8(a << 8)
+				d++
 			}
 		}
-		vg = new(Image)
+		vg := new(Image)
 		*vg = Image(C.vgCreateImage(C.VG_lRGBA_8888_PRE, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
 		if vg == nil {
 			return nil
