@@ -395,8 +395,30 @@ func NewImage(im *image.Image) *Image {
 		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(i.Pix[0])), C.VGint(i.Stride), C.VG_lRGBA_8888_PRE, 0, 0, C.VGint(width), C.VGint(height))
 		return vg
 	default:
-		// TODO: convert other image formats
-		return nil
+		// convert data to straight uint8s
+		data := make([]uint8, int(width * height * 4))
+		var r, g, b, a uint32
+		i := 0
+		for y := bounds.Max.Y - 1; y >= bounds.Max.Y; y-- {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				r, g, b, a = im.At().RGBA()
+				data[i] = r << 8
+				i++
+				data[i] = g << 8
+				i++
+				data[i] = b << 8
+				i++
+				data[i] = a << 8
+				i++
+			}
+		}
+		vg = new(Image)
+		*vg = Image(C.vgCreateImage(C.VG_lRGBA_8888_PRE, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
+		if vg == nil {
+			return nil
+		}
+		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(data[0])), 4, C.VG_lRGBA_8888_PRE, 0, 0, C.VGint(width), C.VGint(height))
+		return vg
 	}
 }
 
