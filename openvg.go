@@ -399,7 +399,7 @@ func NewImage(im *image.Image) *Image {
 		data := make([]uint8, int(width * height * 4))
 		var r, g, b, a uint32
 		d := 0
-		for y := bounds.Max.Y - 1; y >= bounds.Max.Y; y-- {
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 			for x := bounds.Min.X; x < bounds.Max.X; x++ {
 				r, g, b, a = (*im).At(x, y).RGBA()
 				data[d] = uint8(r << 8)
@@ -417,7 +417,7 @@ func NewImage(im *image.Image) *Image {
 		if vg == nil {
 			return nil
 		}
-		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(data[0])), 4, C.VG_lRGBA_8888_PRE, 0, 0, C.VGint(width), C.VGint(height))
+		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(data[0])), C.VGint(4 * width), C.VG_lRGBA_8888_PRE, 0, 0, C.VGint(width), C.VGint(height))
 		return vg
 	}
 }
