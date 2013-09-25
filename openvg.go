@@ -357,8 +357,8 @@ type Image C.VGImage
 // Create a new Image texture in Video memory
 func NewImage(im *image.Image) *Image {
 	bounds := (*im).Bounds()
-	width := int32(bounds.Max.X - bounds.Min.X)
-	height := int32(bounds.Max.Y - bounds.Min.Y)
+	width := int32(bounds.Dx())
+	height := int32(bounds.Dy())
 	// Type switch to get the true image type
 	// Create texture
 	switch i := (*im).(type) {
@@ -399,7 +399,7 @@ func NewImage(im *image.Image) *Image {
 		data := make([]uint8, int(width * height * 4))
 		var r, g, b, a uint32
 		d := 0
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for y := bounds.Max.Y - 1; y >= bounds.Min.Y; y-- {
 			for x := bounds.Min.X; x < bounds.Max.X; x++ {
 				r, g, b, a = (*im).At(x, y).RGBA()
 				data[d] = uint8(r << 8)
@@ -413,11 +413,11 @@ func NewImage(im *image.Image) *Image {
 			}
 		}
 		vg := new(Image)
-		*vg = Image(C.vgCreateImage(C.VG_lRGBA_8888_PRE, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
+		*vg = Image(C.vgCreateImage(C.VG_sABGR_8888, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_BETTER))
 		if vg == nil {
 			return nil
 		}
-		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(data[0])), C.VGint(4 * width), C.VG_lRGBA_8888_PRE, 0, 0, C.VGint(width), C.VGint(height))
+		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(data[0])), C.VGint(4 * width), C.VG_sABGR_8888, 0, 0, C.VGint(width), C.VGint(height))
 		return vg
 	}
 }
