@@ -4,7 +4,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/ajstarks/openvg"
+	"github.com/genbattle/openvg"
 	"math/rand"
 	"os"
 	"strconv"
@@ -307,11 +307,31 @@ func imagetest(w, h int) {
 	lry := lly
 	openvg.Start(w, h)
 	openvg.Background(0, 0, 0)
-	openvg.Image(cx, cy, "desert1.jpg")
-	openvg.Image(ulx, uly, "desert2.jpg")
-	openvg.Image(urx, ury, "desert3.jpg")
-	openvg.Image(llx, lly, "desert4.jpg")
-	openvg.Image(lrx, lry, "desert5.jpg")
+	openvg.Translate(cx, cy)
+	im, _ := openvg.OpenImage("desert1.jpg")
+	im.Draw()
+	openvg.Translate(-cx, -cy)
+	im.Destroy()
+	openvg.Translate(ulx, uly)
+	im, _ = openvg.OpenImage("desert2.jpg")
+	im.Draw()
+	openvg.Translate(-ulx, -uly)
+	im.Destroy()
+	openvg.Translate(urx, ury)
+	im, _ = openvg.OpenImage("desert3.jpg")
+	im.Draw()
+	openvg.Translate(-urx, -ury)
+	im.Destroy()
+	openvg.Translate(llx, lly)
+	im, _ = openvg.OpenImage("desert4.jpg")
+	im.Draw()
+	openvg.Translate(-llx, -lly)
+	im.Destroy()
+	openvg.Translate(lrx, lry)
+	im, _ = openvg.OpenImage("desert5.jpg")
+	im.Draw()
+	openvg.Translate(-lrx, -lry)
+	im.Destroy()
 	openvg.End()
 }
 
@@ -326,8 +346,6 @@ func imagetable(w, h int) {
 		"desert5.jpg",
 		"desert6.jpg",
 		"desert7.jpg",
-		//{"http://farm4.static.flickr.com/3546/3338566612_9c56bfb53e_m.jpg", 240, 164},
-		//{"http://farm4.static.flickr.com/3642/3337734413_e36baba755_m.jpg", 240, 164},
 	}
 	left := float32(50.0)
 	bot := float32(h-imgh) - 50.0
@@ -337,7 +355,11 @@ func imagetable(w, h int) {
 	openvg.Start(w, h)
 	openvg.BackgroundColor("black")
 	for _, iname := range itable {
-		openvg.Image(x, y, iname)
+		openvg.Translate(x, y)
+		im, _ := openvg.OpenImage(iname)
+		im.Draw()
+		openvg.Translate(-x, -y)
+		im.Destroy()
 		openvg.FillRGB(255, 255, 255, 0.3)
 		openvg.Rect(x, y, float32(imgw), 32)
 		openvg.FillRGB(0, 0, 0, 1)
@@ -492,7 +514,11 @@ func refcard(width, height int) {
 	coordpoint(ex, ey, dotsize, shapecolor)
 
 	sy -= (sh * spacing * 1.5)
-	openvg.Image(sx, sy, "starx.jpg")
+	openvg.Translate(sx, sy)
+	im, _ := openvg.OpenImage("starx.jpg")
+	im.Draw()
+	im.Destroy()
+	openvg.Translate(-sx, -sy)
 
 	openvg.End()
 }
@@ -516,6 +542,7 @@ func rotext(w, h, n int, s string) {
 		size += n     // enlarge
 		openvg.Rotate(deg)
 	}
+	openvg.Translate(-x, -y)
 	openvg.End()
 }
 
@@ -693,7 +720,11 @@ func advert(w, h int) {
 	y -= 100
 	openvg.FillRGB(128, 128, 128, 1)
 	openvg.TextMid(midx, y, a, "sans", f3)
-	openvg.Image(float32(w/2)-float32(imw/2), 20.0, "starx.jpg")
+	openvg.Translate(float32(w/2)-float32(imw/2), 20.0)
+	im, _ := openvg.OpenImage("starx.jpg")
+	im.Draw()
+	im.Destroy()
+	openvg.ResetMatrix()
 	openvg.End()
 }
 
@@ -774,6 +805,11 @@ func loop(w, h int) {
 		if !pause(in) {
 			return
 		}
+
+		imagetest(w, h)
+		if !pause(in) {
+			return
+		}
 	}
 }
 
@@ -810,6 +846,9 @@ func demo(w, h, s int) {
 	raspi(w, h, "The Raspberry Pi")
 	time.Sleep(sec)
 
+	imagetest(w, h)
+	time.Sleep(sec)
+
 	gradient(w, h)
 	time.Sleep(sec)
 
@@ -826,12 +865,10 @@ func WaitEnd() {
 			break
 		}
 	}
-	openvg.RestoreTerm()
 	openvg.Finish()
 }
 
 func usage(s string) {
-	openvg.RestoreTerm()
 	fmt.Fprintf(os.Stderr,
 		"%s [command]\n\tdemo sec\n\tastro\n\ttest ...\n\trand n\n\trotate n ...\n\timage\n\ttext\n\tfontsize\n\traspi\n\tgradient\n\tadvert\n", s)
 }
@@ -840,10 +877,8 @@ func usage(s string) {
 // Exit and clean up when you hit [RETURN].
 func main() {
 	rseed()
-	openvg.SaveTerm()
 	nargs := len(os.Args)
 	w, h := openvg.Init()
-	openvg.RawTerm()
 	progname := os.Args[0]
 	n := 5
 	if nargs > 2 {
@@ -880,6 +915,8 @@ func main() {
 			rotext(w, h, n, "Raspi")
 		case "gradient":
 			gradient(w, h)
+		case "corners":
+			imagetest(w, h)
 		default:
 			refcard(w, h)
 		}
