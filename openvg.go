@@ -565,6 +565,11 @@ func TextWidth(s string, font string, size int) float32 {
 	return float32(C.TextWidth(t, selectfont(font), C.int(size)))
 }
 
+// ResetMatrix resets the transformation matrices back to the identity matrix
+func ResetMatrix() {
+	C.vgLoadIdentity()
+}
+
 // Translate translates the coordinate system to (x,y)
 func Translate(x, y float32) {
 	C.Translate(C.VGfloat(x), C.VGfloat(y))
