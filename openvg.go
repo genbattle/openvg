@@ -413,11 +413,11 @@ func NewImage(im *image.Image) *Image {
 			}
 		}
 		vg := new(Image)
-		*vg = Image(C.vgCreateImage(C.VG_sAGBR_8888_PRE, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
+		*vg = Image(C.vgCreateImage(C.VG_sABGR_8888_PRE, C.VGint(width), C.VGint(height), C.VG_IMAGE_QUALITY_FASTER))
 		if vg == nil {
 			return nil
 		}
-		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(data[0])), C.VGint(4 * width), C.VG_sAGBR_8888_PRE, 0, 0, C.VGint(width), C.VGint(height))
+		C.vgImageSubData(C.VGImage(*vg), unsafe.Pointer(&(data[0])), C.VGint(4 * width), C.VG_sABGR_8888_PRE, 0, 0, C.VGint(width), C.VGint(height))
 		return vg
 	}
 }
