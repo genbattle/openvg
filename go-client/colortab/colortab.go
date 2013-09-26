@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ajstarks/openvg"
+	"github.com/genbattle/openvg"
 )
 
 func main() {

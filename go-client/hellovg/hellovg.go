@@ -3,7 +3,7 @@ package main
 
 import (
 	"bufio"
-	"github.com/ajstarks/openvg"
+	"github.com/genbattle/openvg"
 	"os"
 )
 

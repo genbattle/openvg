@@ -9,7 +9,7 @@ import (
 	"math"
 	"os"
 
-	"github.com/ajstarks/openvg"
+	"github.com/genbattle/openvg"
 )
 
 // rawdata defines data as float32 x,y coordinates

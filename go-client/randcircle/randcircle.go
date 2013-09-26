@@ -4,7 +4,7 @@ package main
 import (
 	"bufio"
 	"flag"
-	"github.com/ajstarks/openvg"
+	"github.com/genbattle/openvg"
 	"math/rand"
 	"os"
 	"time"

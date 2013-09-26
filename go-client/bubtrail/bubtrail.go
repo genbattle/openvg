@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/ajstarks/openvg"
+	"github.com/genbattle/openvg"
 )
 
 var (
