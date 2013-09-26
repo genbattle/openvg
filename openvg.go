@@ -567,6 +567,11 @@ func TextWidth(s string, font string, size int) float32 {
 
 // ResetMatrix resets the transformation matrices back to the identity matrix
 func ResetMatrix() {
+	C.vgSeti(C.VG_MATRIX_MODE, C.VG_MATRIX_PATH_USER_TO_SURFACE)
+	C.vgLoadIdentity()
+	C.vgSeti(C.VG_MATRIX_MODE, C.VG_MATRIX_GLYPH_USER_TO_SURFACE)
+	C.vgLoadIdentity()
+	C.vgSeti(C.VG_MATRIX_MODE, C.VG_MATRIX_IMAGE_USER_TO_SURFACE)
 	C.vgLoadIdentity()
 }
 
