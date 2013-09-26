@@ -408,6 +408,7 @@ void Text(VGfloat x, VGfloat y, char *s, Fontinfo f, int pointsize) {
 	VGfloat size = (VGfloat) pointsize, xx = x, mm[9];
 	int i;
 
+	vgSeti(VG_MATRIX_MODE, VG_MATRIX_PATH_USER_TO_SURFACE);
 	vgGetMatrix(mm);
 	for (i = 0; i < (int)strlen(s); i++) {
 		unsigned int character = (unsigned int)s[i];
